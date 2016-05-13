@@ -8,16 +8,23 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import org.tartarus.snowball.SnowballStemmer;
+
 public class Tokenizer {
 
 	StopWords stopwords = new StopWords();
-	PorterStemmer stemmer = new PorterStemmer();
+//	PorterStemmer stemmer = new PorterStemmer();
 
-	public void tokenize() throws IOException {
+	public void tokenize() throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+		
+		Class<?> stemClass = Class.forName("org.tartarus.snowball.ext.englishStemmer");
+		SnowballStemmer stemmer = (SnowballStemmer) stemClass.newInstance();
+		
 		File wikiDir = new File("resources\\wiki");
 		File[] files = wikiDir.listFiles();
 		for (int j = 0; j < files.length; j++) {
 			// for (File file : wikiDir.listFiles()) {
+			int fileNumber = Integer.valueOf(files[j].getPath().replaceAll("[^\\d]", ""));
 			Scanner sc = new Scanner(files[j]);
 			StringBuilder sb = new StringBuilder();
 			while (sc.hasNext()) {
@@ -28,8 +35,10 @@ public class Tokenizer {
 					for (int i = 0; i < tokens.size(); i++) {
 						if (!stopwords.contains(tokens.get(i))) {
 
-//							String stem = stemmer.stem(tokens.get(i).trim());
-							sb.append(tokens.get(i));
+							stemmer.setCurrent(tokens.get(i).trim());
+							stemmer.stem();
+							String stemmed = stemmer.getCurrent();
+							sb.append(stemmed);
 							if (i < tokens.size() - 1 || sc.hasNext())
 								sb.append(" ");
 						}
@@ -37,7 +46,7 @@ public class Tokenizer {
 				}
 			}
 			File tokenizedFile = new File("resources\\Tokenized\\doc_"
-					+ (j + 1) + "_tokenized.txt");
+					+ fileNumber + "_tokenized.txt");
 			if (!tokenizedFile.exists())
 				tokenizedFile.createNewFile();
 			else {
@@ -56,7 +65,7 @@ public class Tokenizer {
 			throws FileNotFoundException {
 		ArrayList<String> tokenized = new ArrayList<>();
 		word = word.toLowerCase();
-		String[] justWord = word.split("[^A-Za-z0-9'.]");
+		String[] justWord = word.split("[^A-Za-z0-9']");
 		if (justWord.length > 1) {
 			String firstHalf = justWord[0];
 			String secondHalf = justWord[1];

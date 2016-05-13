@@ -43,7 +43,7 @@ public class TokenizerTest {
 	}
 	
 	@Test
-	public void testTokenize() throws IOException{
+	public void testTokenize() throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException{
 		tokenizer.tokenize();
 	}
 	

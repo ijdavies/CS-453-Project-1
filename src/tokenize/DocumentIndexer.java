@@ -8,23 +8,31 @@ import java.util.Scanner;
 public class DocumentIndexer {
 
 	HashMap<String, HashMap<Integer, Integer>> index = new HashMap<>();
+	HashMap<Integer, Integer> wordCounts = new HashMap<>();
+
 
 	public void indexAllFiles() throws FileNotFoundException{
 		File tokenDir = new File("resources\\Tokenized");
 		File[] files = tokenDir.listFiles();
 		for (int i = 0; i < files.length; i++){
-			indexFile(files[i], i+1);
+			int fileNumber = Integer.valueOf(files[i].getPath().replaceAll("[^\\d]", ""));
+			indexFile(files[i], fileNumber);
 		}
+		System.out.println("Done Indexing");
 	}
 	
 	public void indexFile(File file, int docNumber)
 			throws FileNotFoundException {
 		Scanner sc = new Scanner(file);
+		int wordCount = 0;
 		while (sc.hasNext()) {
 			String word = sc.next();
 			addWordToIndex(word, docNumber);
+			wordCount++;
 		}
+		wordCounts.put(docNumber, wordCount);
 		sc.close();
+		System.out.println("Indexed file " + docNumber);
 	}
 
 	private void addWordToIndex(String word, int docNumber) {
@@ -42,6 +50,22 @@ public class DocumentIndexer {
 			index.put(word, newValue);
 			
 		}
+	}
+	
+	public HashMap<String, HashMap<Integer, Integer>> getIndex() {
+		return index;
+	}
+	
+	public void setIndex(HashMap<String, HashMap<Integer, Integer>> index) {
+		this.index = index;
+	}
+	
+	public HashMap<Integer, Integer> getWordCounts() {
+		return wordCounts;
+	}
+	
+	public void setWordCounts(HashMap<Integer, Integer> wordCounts) {
+		this.wordCounts = wordCounts;
 	}
 
 }
